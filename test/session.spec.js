@@ -4,7 +4,12 @@ import unexpectedSinon from "unexpected-sinon";
 import sinon from "sinon";
 import { observable, flush } from "@dependable/state";
 
-import { saveSession, restoreSession } from "../src/session.js";
+import {
+  saveSession,
+  restoreSession,
+  createSnapshot,
+  restoreSnapshot,
+} from "../src/session.js";
 
 const expect = unexpected
   .clone()
@@ -66,6 +71,92 @@ describe("restoreSession", () => {
     );
 
     restoreSession();
+  });
+
+  it("initializes restored observables", () => {
+    const text = observable("will be override", { id: "text" });
+
+    expect(text, "to satisfy", "Hello session");
+  });
+
+  it("reuses observables with the same id", () => {
+    const reference0 = observable("will be override", { id: "text" });
+    const reference1 = observable("will be override", { id: "text" });
+
+    expect(reference0, "to be", reference1);
+  });
+});
+
+describe("restoreSession", () => {
+  beforeEach(() => {
+    // Make sure other tests doesn't have registered references
+    global.__dependable._references.clear();
+    global.__dependable._initial.clear();
+
+    global.sessionStorage = new SessionStorage();
+  });
+
+  describe("with a non-existing session", () => {
+    it("throws an error", () => {
+      expect(
+        () => {
+          restoreSession();
+        },
+        "to throw",
+        "No session to restore"
+      );
+    });
+  });
+  describe("with a valid session", () => {
+    beforeEach(() => {
+      sessionStorage.setItem(
+        "@dependable/session",
+        '{"text":"Hello session","array":[0,1,2]}'
+      );
+
+      restoreSession();
+    });
+
+    it("initializes restored observables", () => {
+      const text = observable("will be override", { id: "text" });
+
+      expect(text, "to satisfy", "Hello session");
+    });
+
+    it("reuses observables with the same id", () => {
+      const reference0 = observable("will be override", { id: "text" });
+      const reference1 = observable("will be override", { id: "text" });
+
+      expect(reference0, "to be", reference1);
+    });
+  });
+});
+
+describe("createSnapshot", () => {
+  beforeEach(() => {
+    // Make sure other tests doesn't have registered references
+    global.__dependable._references.clear();
+    global.__dependable._initial.clear();
+
+    const textObservable = observable("Hello session", { id: "text" });
+    const arrayObservable = observable([0, 1, 2], { id: "array" });
+  });
+
+  it("stores the state in session store", () => {
+    expect(createSnapshot(), "to equal", {
+      text: "Hello session",
+      array: [0, 1, 2],
+    });
+  });
+});
+
+describe("restoreSnapshot", () => {
+  beforeEach(() => {
+    // Make sure other tests doesn't have registered references
+    global.__dependable._references.clear();
+    global.__dependable._initial.clear();
+
+    restoreSnapshot({ text: "Hello session", array: [0, 1, 2] });
   });
 
   it("initializes restored observables", () => {
