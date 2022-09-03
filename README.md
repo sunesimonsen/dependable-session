@@ -1,11 +1,11 @@
 # @dependable/session
 
 [![Checks](https://github.com/sunesimonsen/dependable-session/workflows/CI/badge.svg)](https://github.com/sunesimonsen/dependable-session/actions?query=workflow%3ACI+branch%3Amain)
-[![Bundle Size](https://img.badgesize.io/https:/unpkg.com/@dependable/state/dist/dependable-session.esm.min.js?label=gzip&compression=gzip)](https://unpkg.com/@dependable/session/dist/dependable-session.esm.min.js)
+[![Bundle Size](https://img.badgesize.io/https:/unpkg.com/@dependable/session/dist/dependable-session.esm.min.js?label=gzip&compression=gzip)](https://unpkg.com/@dependable/session/dist/dependable-session.esm.min.js)
 
 Save and restore [@dependable/state](https://github.com/sunesimonsen/dependable-state) to session storage.
 
-[API documentation](https://dependable-session-api.surge.sh/modules/session.html)
+[API documentation](https://dependable-session-api.surge.sh/modules.html)
 
 ## Install
 
