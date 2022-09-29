@@ -42,6 +42,8 @@ export const restoreSnapshot = (snapshot) => {
 
 /**
  * Restore saved @dependable/state from session storage.
+ *
+ * @throws Error if no session has been stored.
  */
 export const restoreSession = () => {
   const data = sessionStorage.getItem("@dependable/session");
