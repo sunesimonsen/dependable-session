@@ -107,6 +107,7 @@ describe("restoreSession", () => {
       );
     });
   });
+
   describe("with a valid session", () => {
     beforeEach(() => {
       sessionStorage.setItem(
@@ -128,6 +129,10 @@ describe("restoreSession", () => {
       const reference1 = observable("will be override", { id: "text" });
 
       expect(reference0, "to be", reference1);
+    });
+
+    it("removes the stored session", () => {
+      expect(sessionStorage.getItem("@dependable/session"), "to be undefined");
     });
   });
 });

@@ -48,6 +48,8 @@ export const restoreSession = () => {
   if (!data) {
     throw new Error("No session to restore");
   }
+
+  sessionStorage.removeItem("@dependable/session");
   const snapshot = JSON.parse(data);
 
   restoreSnapshot(snapshot);
