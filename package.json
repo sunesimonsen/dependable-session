@@ -54,6 +54,6 @@
     "unexpected-sinon": "^11.1.0"
   },
   "dependencies": {
-    "@dependable/state": "^0.14.0"
+    "@dependable/state": "^0.15.0"
   }
 }

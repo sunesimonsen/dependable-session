@@ -37,7 +37,7 @@ class SessionStorage {
 describe("saveSession", () => {
   beforeEach(() => {
     // Make sure other tests doesn't have registered references
-    global.__dependable._nextId = 0;
+    global.__dependable.nextId = 0;
     global.__dependable._references.clear();
     global.__dependable._initial.clear();
 
@@ -53,7 +53,10 @@ describe("saveSession", () => {
     expect(
       sessionStorage.getItem("@dependable/session"),
       "to equal",
-      '{"text":"Hello session","array":[0,1,2]}'
+      JSON.stringify({
+        nextId: 0,
+        observables: { text: "Hello session", array: [0, 1, 2] },
+      })
     );
   });
 });
@@ -61,7 +64,7 @@ describe("saveSession", () => {
 describe("restoreSession", () => {
   beforeEach(() => {
     // Make sure other tests doesn't have registered references
-    global.__dependable._nextId = 0;
+    global.__dependable.nextId = 0;
     global.__dependable._references.clear();
     global.__dependable._initial.clear();
 
@@ -69,7 +72,10 @@ describe("restoreSession", () => {
 
     sessionStorage.setItem(
       "@dependable/session",
-      '{"text":"Hello session","array":[0,1,2]}'
+      JSON.stringify({
+        nextId: 0,
+        observables: { text: "Hello session", array: [0, 1, 2] },
+      })
     );
 
     restoreSession();
@@ -92,7 +98,7 @@ describe("restoreSession", () => {
 describe("restoreSession", () => {
   beforeEach(() => {
     // Make sure other tests doesn't have registered references
-    global.__dependable._nextId = 0;
+    global.__dependable.nextId = 0;
     global.__dependable._references.clear();
     global.__dependable._initial.clear();
 
@@ -115,7 +121,10 @@ describe("restoreSession", () => {
     beforeEach(() => {
       sessionStorage.setItem(
         "@dependable/session",
-        '{"text":"Hello session","array":[0,1,2]}'
+        JSON.stringify({
+          nextId: 0,
+          observables: { text: "Hello session", array: [0, 1, 2] },
+        })
       );
 
       restoreSession();
@@ -143,7 +152,7 @@ describe("restoreSession", () => {
 describe("createSnapshot", () => {
   beforeEach(() => {
     // Make sure other tests doesn't have registered references
-    global.__dependable._nextId = 0;
+    global.__dependable.nextId = 14;
     global.__dependable._references.clear();
     global.__dependable._initial.clear();
 
@@ -153,8 +162,11 @@ describe("createSnapshot", () => {
 
   it("stores the state in session store", () => {
     expect(createSnapshot(), "to equal", {
-      text: "Hello session",
-      array: [0, 1, 2],
+      nextId: 14,
+      observables: {
+        text: "Hello session",
+        array: [0, 1, 2],
+      },
     });
   });
 });
@@ -162,11 +174,18 @@ describe("createSnapshot", () => {
 describe("restoreSnapshot", () => {
   beforeEach(() => {
     // Make sure other tests doesn't have registered references
-    global.__dependable._nextId = 0;
+    global.__dependable.nextId = 0;
     global.__dependable._references.clear();
     global.__dependable._initial.clear();
 
-    restoreSnapshot({ text: "Hello session", array: [0, 1, 2] });
+    restoreSnapshot({
+      nextId: 42,
+      observables: { text: "Hello session", array: [0, 1, 2] },
+    });
+  });
+
+  it("initializes the next id", () => {
+    global.__dependable.nextId = 42;
   });
 
   it("initializes restored observables", () => {

@@ -15,7 +15,7 @@ describe("storeObservableInCache", () => {
 
   beforeEach(() => {
     // Make sure other tests doesn't have registered references
-    global.__dependable._nextId = 0;
+    global.__dependable.nextId = 0;
     global.__dependable._references.clear();
     global.__dependable._initial.clear();
 
