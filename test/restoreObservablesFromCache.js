@@ -20,19 +20,19 @@ const cache = {
   false: false,
   array: [0, 1, 2],
   object: { zero: 0, one: 1, two: 2 },
-  anonymous$0: "Value of an anonymous observable",
-  anonymous$1: { $reference: "anonymous$0" },
+  $0: "Value of an anonymous observable",
+  $1: { $reference: "$0" },
   main: {
     plainValue: 42,
     nestedArray: [{ $reference: "null" }, { $reference: "false" }],
     nestedObject: {
       array: { $reference: "array" },
       object: { $reference: "object" },
-      anonymous: { $reference: "anonymous$0" },
+      anonymous: { $reference: "$0" },
     },
     anonymous: {
-      anonymousObservable: { $reference: "anonymous$0" },
-      nested: { $reference: "anonymous$1" },
+      anonymousObservable: { $reference: "$0" },
+      nested: { $reference: "$1" },
     },
   },
 };
@@ -41,6 +41,7 @@ describe("restoreObservablesFromCache", () => {
   let observables;
   beforeEach(() => {
     // Make sure other tests doesn't have registered references
+    global.__dependable._nextId = 0;
     global.__dependable._references.clear();
     global.__dependable._initial.clear();
 

@@ -1,26 +1,14 @@
-class IdGenerator {
-  constructor(prefix) {
-    this.nextId = 0;
-    this.prefix = prefix;
-  }
-
-  generate() {
-    return `${this.prefix}${this.nextId++}`;
-  }
-}
-
-const objectToJSON = (value, options) =>
+const objectToJSON = (value, cache) =>
   Object.fromEntries(
-    Object.entries(value).map(([k, v]) => [k, toJSON(v, options)])
+    Object.entries(value).map(([k, v]) => [k, toJSON(v, cache)])
   );
 
-const arrayToJSON = (value, options) =>
-  value.map((item) => toJSON(item, options));
+const arrayToJSON = (value, cache) => value.map((item) => toJSON(item, cache));
 
-const toJSON = (value, options) => {
+const toJSON = (value, cache) => {
   if (typeof value === "function") {
     if (value.kind === "observable") {
-      const id = storeObservableInCache(value, options.cache, options);
+      const id = storeObservableInCache(value, cache);
       return { $reference: id };
     } else {
       throw new Error(
@@ -31,29 +19,20 @@ const toJSON = (value, options) => {
 
   if (value && typeof value === "object") {
     if (Array.isArray(value)) {
-      return arrayToJSON(value, options);
+      return arrayToJSON(value, cache);
     } else {
-      return objectToJSON(value, options);
+      return objectToJSON(value, cache);
     }
   }
 
   return value;
 };
 
-export const storeObservableInCache = (
-  observable,
-  cache,
-  { ids = new Map(), idGenerator = new IdGenerator("anonymous$") } = {}
-) => {
-  let id = observable.id || ids.get(observable);
-
-  if (!id) {
-    id = idGenerator.generate();
-    ids.set(observable, id);
-  }
+export const storeObservableInCache = (observable, cache) => {
+  const id = observable.id;
 
   if (!cache[id]) {
-    cache[id] = toJSON(observable(), { cache, ids, idGenerator });
+    cache[id] = toJSON(observable(), cache);
   }
 
   return id;

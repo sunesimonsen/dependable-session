@@ -1,7 +1,5 @@
 import { observable } from "@dependable/state";
 
-const isAnonymous = (id) => id.startsWith("anonymous$");
-
 const processArray = (value, cache, observables) =>
   value.map((item) => processValue(item, cache, observables));
 
@@ -32,11 +30,7 @@ const processObservable = (id, cache, observables) => {
 
   const value = processValue(cache[id], cache, observables);
 
-  if (isAnonymous(id)) {
-    observables[id] = observable(value);
-  } else {
-    observables[id] = observable(value, { id });
-  }
+  observables[id] = observable(value, { id });
 
   return observables[id];
 };
@@ -46,9 +40,7 @@ export const restoreObservablesFromCache = (cache) => {
   const observables = {};
 
   for (const id of Object.keys(cache)) {
-    if (!isAnonymous(id)) {
-      result[id] = processObservable(id, cache, observables);
-    }
+    result[id] = processObservable(id, cache, observables);
   }
 
   return result;

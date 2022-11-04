@@ -37,6 +37,7 @@ class SessionStorage {
 describe("saveSession", () => {
   beforeEach(() => {
     // Make sure other tests doesn't have registered references
+    global.__dependable._nextId = 0;
     global.__dependable._references.clear();
     global.__dependable._initial.clear();
 
@@ -60,6 +61,7 @@ describe("saveSession", () => {
 describe("restoreSession", () => {
   beforeEach(() => {
     // Make sure other tests doesn't have registered references
+    global.__dependable._nextId = 0;
     global.__dependable._references.clear();
     global.__dependable._initial.clear();
 
@@ -90,6 +92,7 @@ describe("restoreSession", () => {
 describe("restoreSession", () => {
   beforeEach(() => {
     // Make sure other tests doesn't have registered references
+    global.__dependable._nextId = 0;
     global.__dependable._references.clear();
     global.__dependable._initial.clear();
 
@@ -140,6 +143,7 @@ describe("restoreSession", () => {
 describe("createSnapshot", () => {
   beforeEach(() => {
     // Make sure other tests doesn't have registered references
+    global.__dependable._nextId = 0;
     global.__dependable._references.clear();
     global.__dependable._initial.clear();
 
@@ -158,6 +162,7 @@ describe("createSnapshot", () => {
 describe("restoreSnapshot", () => {
   beforeEach(() => {
     // Make sure other tests doesn't have registered references
+    global.__dependable._nextId = 0;
     global.__dependable._references.clear();
     global.__dependable._initial.clear();
 
