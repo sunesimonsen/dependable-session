@@ -64,7 +64,16 @@ const createTodo = ({ id = nextId++, text }) => ({
   text: observable(text),
 });
 
-const todos = observable([], { id: "todos" });
+const todos = observable(
+  [
+    createTodo("Buy milk"),
+    createTodo("Walk the dog"),
+    createTodo("Read important mail"),
+  ],
+  { id: "todos" }
+);
+
+saveSession();
 ```
 
 If we save that, we will save the observable with the id `todos` together with all of the todos it contains.

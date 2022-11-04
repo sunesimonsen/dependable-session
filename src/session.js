@@ -9,13 +9,13 @@ import { restoreObservablesFromCache } from "./restoreObservablesFromCache.js";
  * @returns {Object} a snapshot of the current session.
  */
 export const createSnapshot = () => {
-  const snapshot = {};
+  const observables = {};
   for (const subscribable of subscribables()) {
     if (subscribable.kind === "observable") {
-      storeObservableInCache(subscribable, snapshot);
+      storeObservableInCache(subscribable, observables);
     }
   }
-  return snapshot;
+  return { nextId: globalThis.__dependable.nextId, observables };
 };
 
 /**
@@ -33,9 +33,11 @@ export const saveSession = () => {
  * @param {Object} snapshot the snapshot to be restored.
  */
 export const restoreSnapshot = (snapshot) => {
-  const restored = restoreObservablesFromCache(snapshot);
+  const observables = restoreObservablesFromCache(snapshot.observables);
 
-  for (const observable of Object.values(restored)) {
+  globalThis.__dependable.nextId = snapshot.nextId;
+
+  for (const observable of Object.values(observables)) {
     registerInitial(observable);
   }
 };
