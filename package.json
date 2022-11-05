@@ -8,17 +8,8 @@
     ".": "./src/session.js"
   },
   "types": "./types/state.d.ts",
-  "files": [
-    "dist",
-    "src",
-    "types"
-  ],
-  "keywords": [
-    "dependable",
-    "observable",
-    "state",
-    "session"
-  ],
+  "files": ["dist", "src", "types"],
+  "keywords": ["dependable", "observable", "state", "session"],
   "scripts": {
     "test": "mocha",
     "format": "prettier --write '**/*.js'",
@@ -63,6 +54,6 @@
     "unexpected-sinon": "^11.1.0"
   },
   "dependencies": {
-    "@dependable/state": "^0.15.0"
+    "@dependable/state": "^0.17.0"
   }
 }

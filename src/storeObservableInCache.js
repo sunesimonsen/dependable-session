@@ -12,7 +12,8 @@ const toJSON = (value, cache) => {
       return { $reference: id };
     } else {
       throw new Error(
-        "Observables can only contain JSON serializable data and other observables"
+        "Observables can only contain JSON serializable data and other observables.\n" +
+          "Use the restore: false option to skip the observable"
       );
     }
   }

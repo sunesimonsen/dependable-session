@@ -11,7 +11,7 @@ import { restoreObservablesFromCache } from "./restoreObservablesFromCache.js";
 export const createSnapshot = () => {
   const observables = {};
   for (const subscribable of subscribables()) {
-    if (subscribable.kind === "observable") {
+    if (subscribable.kind === "observable" && subscribable.restore) {
       storeObservableInCache(subscribable, observables);
     }
   }

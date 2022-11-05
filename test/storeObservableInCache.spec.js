@@ -30,6 +30,21 @@ describe("storeObservableInCache", () => {
     anonymousObservable = observable("Value of an anonymous observable");
   });
 
+  it("throws when storing values that can't be serialized", () => {
+    const cache = {};
+
+    const functionObservable = observable(() => {}, { id: "function" });
+
+    expect(
+      () => {
+        storeObservableInCache(functionObservable, cache);
+      },
+      "to throw",
+      "Observables can only contain JSON serializable data and other observables.\n" +
+        "Use the restore: false option to skip the observable"
+    );
+  });
+
   it("stores observables with plain values", () => {
     const cache = {};
     storeObservableInCache(nullObservable, cache);
