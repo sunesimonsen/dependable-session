@@ -1,15 +1,24 @@
 {
   "type": "module",
   "name": "@dependable/session",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Save and restore @dependable/state to the session storage",
   "module": "./src/session.js",
   "exports": {
     ".": "./src/session.js"
   },
   "types": "./types/state.d.ts",
-  "files": ["dist", "src", "types"],
-  "keywords": ["dependable", "observable", "state", "session"],
+  "files": [
+    "dist",
+    "src",
+    "types"
+  ],
+  "keywords": [
+    "dependable",
+    "observable",
+    "state",
+    "session"
+  ],
   "scripts": {
     "test": "mocha",
     "format": "prettier --write '**/*.js'",
