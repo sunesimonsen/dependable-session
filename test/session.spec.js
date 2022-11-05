@@ -157,6 +157,10 @@ describe("createSnapshot", () => {
     global.__dependable._initial.clear();
 
     const textObservable = observable("Hello session", { id: "text" });
+    const noRestore = observable("Don't restore", {
+      id: "dont-restore",
+      restore: false,
+    });
     const arrayObservable = observable([0, 1, 2], { id: "array" });
   });
 
