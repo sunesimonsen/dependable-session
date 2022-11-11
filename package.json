@@ -44,8 +44,8 @@
     "node": ">=14"
   },
   "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.0.1",
     "c8": "^7.11.3",
-    "deep-clone": "^3.0.3",
     "eslint": "^8.17.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
@@ -64,6 +64,9 @@
     "unexpected-sinon": "^11.1.0"
   },
   "dependencies": {
-    "@dependable/state": "^0.17.0"
+    "@dependable/state": "^0.17.0",
+    "just-clone": "^6.1.1",
+    "just-diff": "^5.1.1",
+    "just-diff-apply": "^5.4.1"
   }
 }

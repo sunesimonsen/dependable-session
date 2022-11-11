@@ -1,6 +1,7 @@
 import { terser } from "rollup-plugin-terser";
+import { nodeResolve } from "@rollup/plugin-node-resolve";
 
-const plugins = [];
+const plugins = [nodeResolve()];
 const minifyPlugins = [
   terser({
     compress: true,
@@ -13,6 +14,8 @@ const minifyPlugins = [
   }),
 ];
 
+const external = ["@dependable/state"];
+
 export default [
   {
     input: "src/session.js",
@@ -20,6 +23,7 @@ export default [
       file: "dist/dependable-session.esm.js",
       format: "esm",
     },
+    external,
     plugins,
   },
   {
@@ -28,6 +32,7 @@ export default [
       file: "dist/dependable-session.esm.min.js",
       format: "esm",
     },
+    external,
     plugins: plugins.concat(minifyPlugins),
   },
 ];

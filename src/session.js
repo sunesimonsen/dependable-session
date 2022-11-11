@@ -2,7 +2,9 @@
 import { subscribables, registerInitial } from "@dependable/state";
 import { storeObservableInCache } from "./storeObservableInCache.js";
 import { restoreObservablesFromCache } from "./restoreObservablesFromCache.js";
-import { deepEqual } from "./equality.js";
+import { diff } from "just-diff";
+import { diffApply } from "just-diff-apply";
+import clone from "just-clone";
 
 /**
  * Returns a snapshot of the current session.
@@ -67,38 +69,7 @@ export const restoreSession = () => {
  * @param {import('./shared').SessionSnapshot} updated a snapshot of the updated session
  * @return {import('./shared').SessionSnapshotDiff} the diff between the snapshots
  */
-export const diffSnapshots = (current, updated) => {
-  const diff = {
-    nextId: updated.nextId,
-    observables: {
-      added: {},
-      updated: {},
-      removed: [],
-    },
-  };
-
-  for (const key of Object.keys(current.observables)) {
-    if (key in updated.observables) {
-      const changed = !deepEqual(
-        current.observables[key],
-        updated.observables[key]
-      );
-      if (changed) {
-        diff.observables.updated[key] = updated.observables[key];
-      }
-    } else {
-      diff.observables.removed.push(key);
-    }
-  }
-
-  for (const key of Object.keys(updated.observables)) {
-    if (!(key in current.observables)) {
-      diff.observables.added[key] = updated.observables[key];
-    }
-  }
-
-  return diff;
-};
+export const diffSnapshots = (current, updated) => diff(current, updated);
 
 /**
  * Applies a snapshot diff to a given session snapshot.
@@ -108,23 +79,9 @@ export const diffSnapshots = (current, updated) => {
  * @return {import('./shared').SessionSnapshot} the resulting session snapshot
  */
 export const applySnapshotDiff = (snapshot, diff) => {
-  const result = {
-    nextId: diff.nextId,
-    observables: {},
-  };
+  const result = clone(snapshot);
 
-  const removes = new Set(diff.observables.removed);
-
-  for (const key of Object.keys(snapshot.observables)) {
-    if (!removes.has(key)) {
-      result.observables[key] =
-        diff.observables.updated[key] || snapshot.observables[key];
-    }
-  }
-
-  for (const key of Object.keys(diff.observables.added)) {
-    result.observables[key] = diff.observables.added[key];
-  }
+  diffApply(result, diff);
 
   return result;
 };
