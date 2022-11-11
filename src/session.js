@@ -6,7 +6,7 @@ import { restoreObservablesFromCache } from "./restoreObservablesFromCache.js";
 /**
  * Returns a snapshot of the current session.
  *
- * @returns {Object} a snapshot of the current session.
+ * @returns {import('./shared').SessionSnapshot} a snapshot of the current session.
  */
 export const createSnapshot = () => {
   const observables = {};
@@ -30,7 +30,7 @@ export const saveSession = () => {
 /**
  * Restore the observables for the given snapshot.
  *
- * @param {Object} snapshot the snapshot to be restored.
+ * @param {import('./shared').SessionSnapshot} snapshot the snapshot to be restored.
  */
 export const restoreSnapshot = (snapshot) => {
   const observables = restoreObservablesFromCache(snapshot.observables);
