@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@dependable/session",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Save and restore @dependable/state to the session storage",
   "module": "./src/session.js",
   "exports": {
