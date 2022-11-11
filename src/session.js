@@ -2,9 +2,7 @@
 import { subscribables, registerInitial } from "@dependable/state";
 import { storeObservableInCache } from "./storeObservableInCache.js";
 import { restoreObservablesFromCache } from "./restoreObservablesFromCache.js";
-import { diff } from "just-diff";
-import { diffApply } from "just-diff-apply";
-import clone from "just-clone";
+import objectDiff from "minimal-object-diff";
 
 /**
  * Returns a snapshot of the current session.
@@ -69,7 +67,8 @@ export const restoreSession = () => {
  * @param {import('./shared').SessionSnapshot} updated a snapshot of the updated session
  * @return {import('./shared').SessionSnapshotDiff} the diff between the snapshots
  */
-export const diffSnapshots = (current, updated) => diff(current, updated);
+export const diffSnapshots = (current, updated) =>
+  objectDiff.diff(current, updated);
 
 /**
  * Applies a snapshot diff to a given session snapshot.
@@ -78,10 +77,5 @@ export const diffSnapshots = (current, updated) => diff(current, updated);
  * @param {import('./shared').SessionSnapshotDiff} diff a snapshot diff to apply to the given session snapshot
  * @return {import('./shared').SessionSnapshot} the resulting session snapshot
  */
-export const applySnapshotDiff = (snapshot, diff) => {
-  const result = clone(snapshot);
-
-  diffApply(result, diff);
-
-  return result;
-};
+export const applySnapshotDiff = (snapshot, diff) =>
+  objectDiff.patch(snapshot, diff);

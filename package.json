@@ -3,22 +3,13 @@
   "name": "@dependable/session",
   "version": "0.6.0",
   "description": "Save and restore @dependable/state to the session storage",
-  "module": "./src/session.js",
+  "module": "./dist/dependable-session.esm.js",
   "exports": {
-    ".": "./src/session.js"
+    ".": "./dist/dependable-session.esm.js"
   },
   "types": "./types/state.d.ts",
-  "files": [
-    "dist",
-    "src",
-    "types"
-  ],
-  "keywords": [
-    "dependable",
-    "observable",
-    "state",
-    "session"
-  ],
+  "files": ["dist", "src", "types"],
+  "keywords": ["dependable", "observable", "state", "session"],
   "scripts": {
     "test": "mocha",
     "format": "prettier --write '**/*.js'",
@@ -44,6 +35,7 @@
     "node": ">=14"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^23.0.2",
     "@rollup/plugin-node-resolve": "^15.0.1",
     "c8": "^7.11.3",
     "eslint": "^8.17.0",
@@ -66,7 +58,6 @@
   "dependencies": {
     "@dependable/state": "^0.17.0",
     "just-clone": "^6.1.1",
-    "just-diff": "^5.1.1",
-    "just-diff-apply": "^5.4.1"
+    "minimal-object-diff": "^0.1.0"
   }
 }
