@@ -3,7 +3,7 @@ import unexpectedDependable from "unexpected-dependable";
 import unexpectedSinon from "unexpected-sinon";
 import sinon from "sinon";
 import { observable, flush } from "@dependable/state";
-import deepClone from "deep-clone";
+import clone from "just-clone";
 
 import {
   applySnapshotDiff,
@@ -187,7 +187,7 @@ describe("restoreSnapshot", () => {
   });
 });
 
-describe("diffSnapshots", () => {
+describe("diffSnapshots and applySnapshotDiff", () => {
   const current = {
     nextId: 3,
     observables: {
@@ -216,148 +216,7 @@ describe("diffSnapshots", () => {
   let updated;
 
   beforeEach(() => {
-    updated = deepClone(current);
-    updated.nextId = current.nextId + 1;
-  });
-
-  describe("with an updated anonymous observable", () => {
-    beforeEach(() => {
-      updated.observables.$0 = "Updated anonymous observable";
-    });
-
-    it("returns the difference between two snapshots", () => {
-      const diff = diffSnapshots(current, updated);
-      expect(diff, "to satisfy", {
-        nextId: 4,
-        observables: {
-          added: {},
-          updated: {
-            $0: "Updated anonymous observable",
-          },
-          removed: [],
-        },
-      });
-    });
-  });
-
-  describe("with an added observable", () => {
-    beforeEach(() => {
-      updated.observables.newObservable = "New observable";
-      updated.observables.main.nestedObject.added = {
-        $reference: "newObservable",
-      };
-    });
-
-    it("returns the difference between two snapshots", () => {
-      const diff = diffSnapshots(current, updated);
-      expect(diff, "to satisfy", {
-        nextId: 4,
-        observables: {
-          added: { newObservable: "New observable" },
-          updated: {
-            main: {
-              nestedObject: {
-                added: { $reference: "newObservable" },
-              },
-            },
-          },
-          removed: [],
-        },
-      });
-    });
-  });
-
-  describe("with an removed observable", () => {
-    beforeEach(() => {
-      delete updated.observables.$1;
-      delete updated.observables.main.anonymous.anonymousObservable;
-    });
-
-    it("returns the difference between two snapshots", () => {
-      const diff = diffSnapshots(current, updated);
-      expect(diff, "to satisfy", {
-        nextId: 4,
-        observables: {
-          added: {},
-          updated: {
-            main: {
-              anonymous: { nested: { $reference: "$1" } },
-            },
-          },
-          removed: ["$1"],
-        },
-      });
-    });
-  });
-
-  describe("with multiple changes", () => {
-    beforeEach(() => {
-      updated.observables.$0 = "Updated anonymous observable";
-      updated.observables.newObservable = "New observable";
-      updated.observables.main.nestedObject.added = {
-        $reference: "newObservable",
-      };
-      delete updated.observables.$1;
-      delete updated.observables.main.anonymous.anonymousObservable;
-    });
-
-    it("returns the difference between two snapshots", () => {
-      const diff = diffSnapshots(current, updated);
-      expect(diff, "to equal", {
-        nextId: 4,
-        observables: {
-          added: { newObservable: "New observable" },
-          updated: {
-            $0: "Updated anonymous observable",
-            main: {
-              plainValue: 42,
-              nestedArray: [{ $reference: "null" }, { $reference: "false" }],
-              nestedObject: {
-                array: { $reference: "array" },
-                object: { $reference: "object" },
-                anonymous: { $reference: "$0" },
-                added: { $reference: "newObservable" },
-              },
-              anonymous: { nested: { $reference: "$1" } },
-            },
-          },
-          removed: ["$1"],
-        },
-      });
-    });
-  });
-});
-
-describe("applySnapshotDiff", () => {
-  const current = {
-    nextId: 3,
-    observables: {
-      null: null,
-      false: false,
-      array: [0, 1, 2],
-      object: { zero: 0, one: 1, two: 2 },
-      $0: "Value of an anonymous observable",
-      $1: { $reference: "$0" },
-      main: {
-        plainValue: 42,
-        nestedArray: [{ $reference: "null" }, { $reference: "false" }],
-        nestedObject: {
-          array: { $reference: "array" },
-          object: { $reference: "object" },
-          anonymous: { $reference: "$0" },
-        },
-        anonymous: {
-          anonymousObservable: { $reference: "$0" },
-          nested: { $reference: "$1" },
-        },
-      },
-    },
-  };
-
-  let updated;
-
-  beforeEach(() => {
-    updated = deepClone(current);
+    updated = clone(current);
     updated.nextId = current.nextId + 1;
 
     updated.observables.$0 = "Updated anonymous observable";
