@@ -8,8 +8,17 @@
     ".": "./src/session.js"
   },
   "types": "./types/state.d.ts",
-  "files": ["dist", "src", "types"],
-  "keywords": ["dependable", "observable", "state", "session"],
+  "files": [
+    "dist",
+    "src",
+    "types"
+  ],
+  "keywords": [
+    "dependable",
+    "observable",
+    "state",
+    "session"
+  ],
   "scripts": {
     "test": "mocha",
     "format": "prettier --write '**/*.js'",
@@ -36,6 +45,7 @@
   },
   "devDependencies": {
     "c8": "^7.11.3",
+    "deep-clone": "^3.0.3",
     "eslint": "^8.17.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",

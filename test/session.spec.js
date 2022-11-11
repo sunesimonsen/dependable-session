@@ -3,12 +3,15 @@ import unexpectedDependable from "unexpected-dependable";
 import unexpectedSinon from "unexpected-sinon";
 import sinon from "sinon";
 import { observable, flush } from "@dependable/state";
+import deepClone from "deep-clone";
 
 import {
-  saveSession,
-  restoreSession,
+  applySnapshotDiff,
   createSnapshot,
+  diffSnapshots,
+  restoreSession,
   restoreSnapshot,
+  saveSession,
 } from "../src/session.js";
 
 const expect = unexpected
@@ -34,15 +37,17 @@ class SessionStorage {
   }
 }
 
+beforeEach(() => {
+  global.sessionStorage = new SessionStorage();
+
+  // Make sure other tests doesn't have registered references
+  global.__dependable.nextId = 0;
+  global.__dependable._references.clear();
+  global.__dependable._initial.clear();
+});
+
 describe("saveSession", () => {
   beforeEach(() => {
-    // Make sure other tests doesn't have registered references
-    global.__dependable.nextId = 0;
-    global.__dependable._references.clear();
-    global.__dependable._initial.clear();
-
-    global.sessionStorage = new SessionStorage();
-
     const textObservable = observable("Hello session", { id: "text" });
     const arrayObservable = observable([0, 1, 2], { id: "array" });
 
@@ -63,13 +68,6 @@ describe("saveSession", () => {
 
 describe("restoreSession", () => {
   beforeEach(() => {
-    // Make sure other tests doesn't have registered references
-    global.__dependable.nextId = 0;
-    global.__dependable._references.clear();
-    global.__dependable._initial.clear();
-
-    global.sessionStorage = new SessionStorage();
-
     sessionStorage.setItem(
       "@dependable/session",
       JSON.stringify({
@@ -96,15 +94,6 @@ describe("restoreSession", () => {
 });
 
 describe("restoreSession", () => {
-  beforeEach(() => {
-    // Make sure other tests doesn't have registered references
-    global.__dependable.nextId = 0;
-    global.__dependable._references.clear();
-    global.__dependable._initial.clear();
-
-    global.sessionStorage = new SessionStorage();
-  });
-
   describe("with a non-existing session", () => {
     it("throws an error", () => {
       expect(
@@ -151,10 +140,7 @@ describe("restoreSession", () => {
 
 describe("createSnapshot", () => {
   beforeEach(() => {
-    // Make sure other tests doesn't have registered references
     global.__dependable.nextId = 14;
-    global.__dependable._references.clear();
-    global.__dependable._initial.clear();
 
     const textObservable = observable("Hello session", { id: "text" });
     const noRestore = observable("Don't restore", {
@@ -177,11 +163,6 @@ describe("createSnapshot", () => {
 
 describe("restoreSnapshot", () => {
   beforeEach(() => {
-    // Make sure other tests doesn't have registered references
-    global.__dependable.nextId = 0;
-    global.__dependable._references.clear();
-    global.__dependable._initial.clear();
-
     restoreSnapshot({
       nextId: 42,
       observables: { text: "Hello session", array: [0, 1, 2] },
@@ -203,5 +184,195 @@ describe("restoreSnapshot", () => {
     const reference1 = observable("will be override", { id: "text" });
 
     expect(reference0, "to be", reference1);
+  });
+});
+
+describe("diffSnapshots", () => {
+  const current = {
+    nextId: 3,
+    observables: {
+      null: null,
+      false: false,
+      array: [0, 1, 2],
+      object: { zero: 0, one: 1, two: 2 },
+      $0: "Value of an anonymous observable",
+      $1: { $reference: "$0" },
+      main: {
+        plainValue: 42,
+        nestedArray: [{ $reference: "null" }, { $reference: "false" }],
+        nestedObject: {
+          array: { $reference: "array" },
+          object: { $reference: "object" },
+          anonymous: { $reference: "$0" },
+        },
+        anonymous: {
+          anonymousObservable: { $reference: "$0" },
+          nested: { $reference: "$1" },
+        },
+      },
+    },
+  };
+
+  let updated;
+
+  beforeEach(() => {
+    updated = deepClone(current);
+    updated.nextId = current.nextId + 1;
+  });
+
+  describe("with an updated anonymous observable", () => {
+    beforeEach(() => {
+      updated.observables.$0 = "Updated anonymous observable";
+    });
+
+    it("returns the difference between two snapshots", () => {
+      const diff = diffSnapshots(current, updated);
+      expect(diff, "to satisfy", {
+        nextId: 4,
+        observables: {
+          added: {},
+          updated: {
+            $0: "Updated anonymous observable",
+          },
+          removed: [],
+        },
+      });
+    });
+  });
+
+  describe("with an added observable", () => {
+    beforeEach(() => {
+      updated.observables.newObservable = "New observable";
+      updated.observables.main.nestedObject.added = {
+        $reference: "newObservable",
+      };
+    });
+
+    it("returns the difference between two snapshots", () => {
+      const diff = diffSnapshots(current, updated);
+      expect(diff, "to satisfy", {
+        nextId: 4,
+        observables: {
+          added: { newObservable: "New observable" },
+          updated: {
+            main: {
+              nestedObject: {
+                added: { $reference: "newObservable" },
+              },
+            },
+          },
+          removed: [],
+        },
+      });
+    });
+  });
+
+  describe("with an removed observable", () => {
+    beforeEach(() => {
+      delete updated.observables.$1;
+      delete updated.observables.main.anonymous.anonymousObservable;
+    });
+
+    it("returns the difference between two snapshots", () => {
+      const diff = diffSnapshots(current, updated);
+      expect(diff, "to satisfy", {
+        nextId: 4,
+        observables: {
+          added: {},
+          updated: {
+            main: {
+              anonymous: { nested: { $reference: "$1" } },
+            },
+          },
+          removed: ["$1"],
+        },
+      });
+    });
+  });
+
+  describe("with multiple changes", () => {
+    beforeEach(() => {
+      updated.observables.$0 = "Updated anonymous observable";
+      updated.observables.newObservable = "New observable";
+      updated.observables.main.nestedObject.added = {
+        $reference: "newObservable",
+      };
+      delete updated.observables.$1;
+      delete updated.observables.main.anonymous.anonymousObservable;
+    });
+
+    it("returns the difference between two snapshots", () => {
+      const diff = diffSnapshots(current, updated);
+      expect(diff, "to equal", {
+        nextId: 4,
+        observables: {
+          added: { newObservable: "New observable" },
+          updated: {
+            $0: "Updated anonymous observable",
+            main: {
+              plainValue: 42,
+              nestedArray: [{ $reference: "null" }, { $reference: "false" }],
+              nestedObject: {
+                array: { $reference: "array" },
+                object: { $reference: "object" },
+                anonymous: { $reference: "$0" },
+                added: { $reference: "newObservable" },
+              },
+              anonymous: { nested: { $reference: "$1" } },
+            },
+          },
+          removed: ["$1"],
+        },
+      });
+    });
+  });
+});
+
+describe("applySnapshotDiff", () => {
+  const current = {
+    nextId: 3,
+    observables: {
+      null: null,
+      false: false,
+      array: [0, 1, 2],
+      object: { zero: 0, one: 1, two: 2 },
+      $0: "Value of an anonymous observable",
+      $1: { $reference: "$0" },
+      main: {
+        plainValue: 42,
+        nestedArray: [{ $reference: "null" }, { $reference: "false" }],
+        nestedObject: {
+          array: { $reference: "array" },
+          object: { $reference: "object" },
+          anonymous: { $reference: "$0" },
+        },
+        anonymous: {
+          anonymousObservable: { $reference: "$0" },
+          nested: { $reference: "$1" },
+        },
+      },
+    },
+  };
+
+  let updated;
+
+  beforeEach(() => {
+    updated = deepClone(current);
+    updated.nextId = current.nextId + 1;
+
+    updated.observables.$0 = "Updated anonymous observable";
+    updated.observables.newObservable = "New observable";
+    updated.observables.main.nestedObject.added = {
+      $reference: "newObservable",
+    };
+    delete updated.observables.$1;
+    delete updated.observables.main.anonymous.anonymousObservable;
+  });
+
+  it("deepEqual(b, applySnapshotDiff(a, diffSnapshots(a, b))", () => {
+    const diff = diffSnapshots(current, updated);
+    const result = applySnapshotDiff(current, diff);
+
+    expect(updated, "to equal", result);
   });
 });
