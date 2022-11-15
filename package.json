@@ -1,15 +1,24 @@
 {
   "type": "module",
   "name": "@dependable/session",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Save and restore @dependable/state to the session storage",
   "module": "./dist/dependable-session.esm.js",
   "exports": {
     ".": "./dist/dependable-session.esm.js"
   },
   "types": "./types/state.d.ts",
-  "files": ["dist", "src", "types"],
-  "keywords": ["dependable", "observable", "state", "session"],
+  "files": [
+    "dist",
+    "src",
+    "types"
+  ],
+  "keywords": [
+    "dependable",
+    "observable",
+    "state",
+    "session"
+  ],
   "scripts": {
     "test": "mocha",
     "format": "prettier --write '**/*.js'",
