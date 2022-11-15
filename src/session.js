@@ -2,7 +2,7 @@
 import { subscribables, registerInitial } from "@dependable/state";
 import { storeObservableInCache } from "./storeObservableInCache.js";
 import { restoreObservablesFromCache } from "./restoreObservablesFromCache.js";
-import objectDiff from "minimal-object-diff";
+import { createPatch, applyPatch } from "./objectDiff.js";
 
 /**
  * Returns a snapshot of the current session.
@@ -61,21 +61,21 @@ export const restoreSession = () => {
 };
 
 /**
- * Creates a diff between two session snapshots.
+ * Creates a patch between two session snapshots.
  *
  * @param {import('./shared').SessionSnapshot} current a snapshot of the current session
  * @param {import('./shared').SessionSnapshot} updated a snapshot of the updated session
  * @return {import('./shared').SessionSnapshotDiff} the diff between the snapshots
  */
 export const diffSnapshots = (current, updated) =>
-  objectDiff.diff(current, updated);
+  createPatch(current, updated);
 
 /**
- * Applies a snapshot diff to a given session snapshot.
+ * Applies a snapshot patch to a given session snapshot.
  *
- * @param {import('./shared').SessionSnapshot} snapshot a session snapshot to apply the diff to
- * @param {import('./shared').SessionSnapshotDiff} diff a snapshot diff to apply to the given session snapshot
+ * @param {import('./shared').SessionSnapshot} snapshot a session snapshot to apply the patch to
+ * @param {import('./shared').SessionSnapshotPatch} patch a snapshot patch to apply to the given session snapshot
  * @return {import('./shared').SessionSnapshot} the resulting session snapshot
  */
-export const applySnapshotDiff = (snapshot, diff) =>
-  objectDiff.patch(snapshot, diff);
+export const applySnapshotDiff = (snapshot, patch) =>
+  applyPatch(snapshot, patch);

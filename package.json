@@ -8,17 +8,8 @@
     ".": "./dist/dependable-session.esm.js"
   },
   "types": "./types/state.d.ts",
-  "files": [
-    "dist",
-    "src",
-    "types"
-  ],
-  "keywords": [
-    "dependable",
-    "observable",
-    "state",
-    "session"
-  ],
+  "files": ["dist", "src", "types"],
+  "keywords": ["dependable", "observable", "state", "session"],
   "scripts": {
     "test": "mocha",
     "format": "prettier --write '**/*.js'",
@@ -66,7 +57,6 @@
   },
   "dependencies": {
     "@dependable/state": "^0.17.0",
-    "just-clone": "^6.1.1",
-    "minimal-object-diff": "^0.1.0"
+    "just-clone": "^6.1.1"
   }
 }
