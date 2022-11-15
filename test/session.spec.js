@@ -229,8 +229,8 @@ describe("diffSnapshots and applySnapshotDiff", () => {
   });
 
   it("deepEqual(b, applySnapshotDiff(a, diffSnapshots(a, b))", () => {
-    const diff = diffSnapshots(current, updated);
-    const result = applySnapshotDiff(current, diff);
+    const patch = diffSnapshots(current, updated);
+    const result = applySnapshotDiff(current, patch);
 
     expect(updated, "to equal", result);
   });
