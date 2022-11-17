@@ -41,7 +41,6 @@ beforeEach(() => {
   global.sessionStorage = new SessionStorage();
 
   // Make sure other tests doesn't have registered references
-  global.__dependable.nextId = 0;
   global.__dependable._references.clear();
   global.__dependable._initial.clear();
 });
@@ -59,8 +58,8 @@ describe("saveSession", () => {
       sessionStorage.getItem("@dependable/session"),
       "to equal",
       JSON.stringify({
-        nextId: 0,
-        observables: { text: "Hello session", array: [0, 1, 2] },
+        text: "Hello session",
+        array: [0, 1, 2],
       })
     );
   });
@@ -71,8 +70,8 @@ describe("restoreSession", () => {
     sessionStorage.setItem(
       "@dependable/session",
       JSON.stringify({
-        nextId: 0,
-        observables: { text: "Hello session", array: [0, 1, 2] },
+        text: "Hello session",
+        array: [0, 1, 2],
       })
     );
 
@@ -91,9 +90,7 @@ describe("restoreSession", () => {
 
     expect(reference0, "to be", reference1);
   });
-});
 
-describe("restoreSession", () => {
   describe("with a non-existing session", () => {
     it("throws an error", () => {
       expect(
@@ -111,8 +108,8 @@ describe("restoreSession", () => {
       sessionStorage.setItem(
         "@dependable/session",
         JSON.stringify({
-          nextId: 0,
-          observables: { text: "Hello session", array: [0, 1, 2] },
+          text: "Hello session",
+          array: [0, 1, 2],
         })
       );
 
@@ -140,23 +137,15 @@ describe("restoreSession", () => {
 
 describe("createSnapshot", () => {
   beforeEach(() => {
-    global.__dependable.nextId = 14;
-
     const textObservable = observable("Hello session", { id: "text" });
-    const noRestore = observable("Don't restore", {
-      id: "dont-restore",
-      restore: false,
-    });
+    const noRestore = observable("Don't restore");
     const arrayObservable = observable([0, 1, 2], { id: "array" });
   });
 
   it("stores the state in session store", () => {
     expect(createSnapshot(), "to equal", {
-      nextId: 14,
-      observables: {
-        text: "Hello session",
-        array: [0, 1, 2],
-      },
+      text: "Hello session",
+      array: [0, 1, 2],
     });
   });
 });
@@ -164,14 +153,12 @@ describe("createSnapshot", () => {
 describe("restoreSnapshot", () => {
   beforeEach(() => {
     restoreSnapshot({
-      nextId: 42,
-      observables: { text: "Hello session", array: [0, 1, 2] },
+      text: "Hello session",
+      array: [0, 1, 2],
     });
   });
 
-  it("initializes the next id", () => {
-    global.__dependable.nextId = 42;
-  });
+  it("initializes the next id", () => {});
 
   it("initializes restored observables", () => {
     const text = observable("will be override", { id: "text" });
@@ -189,26 +176,23 @@ describe("restoreSnapshot", () => {
 
 describe("diffSnapshots and applySnapshotDiff", () => {
   const current = {
-    nextId: 3,
-    observables: {
-      null: null,
-      false: false,
-      array: [0, 1, 2],
-      object: { zero: 0, one: 1, two: 2 },
-      $0: "Value of an anonymous observable",
-      $1: { $reference: "$0" },
-      main: {
-        plainValue: 42,
-        nestedArray: [{ $reference: "null" }, { $reference: "false" }],
-        nestedObject: {
-          array: { $reference: "array" },
-          object: { $reference: "object" },
-          anonymous: { $reference: "$0" },
-        },
-        anonymous: {
-          anonymousObservable: { $reference: "$0" },
-          nested: { $reference: "$1" },
-        },
+    null: null,
+    false: false,
+    array: [0, 1, 2],
+    object: { zero: 0, one: 1, two: 2 },
+    $0: "Value of an anonymous observable",
+    $1: { $reference: "$0" },
+    main: {
+      plainValue: 42,
+      nestedArray: [{ $reference: "null" }, { $reference: "false" }],
+      nestedObject: {
+        array: { $reference: "array" },
+        object: { $reference: "object" },
+        anonymous: { $reference: "$0" },
+      },
+      anonymous: {
+        anonymousObservable: { $reference: "$0" },
+        nested: { $reference: "$1" },
       },
     },
   };
@@ -217,15 +201,14 @@ describe("diffSnapshots and applySnapshotDiff", () => {
 
   beforeEach(() => {
     updated = clone(current);
-    updated.nextId = current.nextId + 1;
 
-    updated.observables.$0 = "Updated anonymous observable";
-    updated.observables.newObservable = "New observable";
-    updated.observables.main.nestedObject.added = {
+    updated.$0 = "Updated anonymous observable";
+    updated.newObservable = "New observable";
+    updated.main.nestedObject.added = {
       $reference: "newObservable",
     };
-    delete updated.observables.$1;
-    delete updated.observables.main.anonymous.anonymousObservable;
+    delete updated.$1;
+    delete updated.main.anonymous.anonymousObservable;
   });
 
   it("deepEqual(b, applySnapshotDiff(a, diffSnapshots(a, b))", () => {

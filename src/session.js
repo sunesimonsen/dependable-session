@@ -1,23 +1,8 @@
 // TODO reject unsupported values
 import { subscribables, registerInitial } from "@dependable/state";
-import { storeObservableInCache } from "./storeObservableInCache.js";
-import { restoreObservablesFromCache } from "./restoreObservablesFromCache.js";
+import { snapshotFromObservables } from "./snapshotFromObservables.js";
+import { observablesFromSnapshot } from "./observablesFromSnapshot.js";
 import { createPatch, applyPatch } from "./objectDiff.js";
-
-/**
- * Returns a snapshot of the current session.
- *
- * @returns {import('./shared').SessionSnapshot} a snapshot of the current session.
- */
-export const createSnapshot = () => {
-  const observables = {};
-  for (const subscribable of subscribables()) {
-    if (subscribable.kind === "observable" && subscribable.restore) {
-      storeObservableInCache(subscribable, observables);
-    }
-  }
-  return { nextId: globalThis.__dependable.nextId, observables };
-};
 
 /**
  * Save the current @dependable/state to session storage.
@@ -29,18 +14,12 @@ export const saveSession = () => {
 };
 
 /**
- * Restore the observables for the given snapshot.
+ * Returns a snapshot of the current session.
  *
- * @param {import('./shared').SessionSnapshot} snapshot the snapshot to be restored.
+ * @returns {import('./shared').SessionSnapshot} a snapshot of the current session.
  */
-export const restoreSnapshot = (snapshot) => {
-  const observables = restoreObservablesFromCache(snapshot.observables);
-
-  globalThis.__dependable.nextId = snapshot.nextId;
-
-  for (const observable of Object.values(observables)) {
-    registerInitial(observable);
-  }
+export const createSnapshot = () => {
+  return snapshotFromObservables(subscribables());
 };
 
 /**
@@ -58,6 +37,19 @@ export const restoreSession = () => {
   const snapshot = JSON.parse(data);
 
   restoreSnapshot(snapshot);
+};
+
+/**
+ * Restore the observables for the given snapshot.
+ *
+ * @param {import('./shared').SessionSnapshot} snapshot the snapshot to be restored.
+ */
+export const restoreSnapshot = (snapshot) => {
+  const observables = observablesFromSnapshot(snapshot);
+
+  for (const observable of Object.values(observables)) {
+    registerInitial(observable);
+  }
 };
 
 /**
