@@ -2,7 +2,7 @@ import unexpected from "unexpected";
 import unexpectedDependable from "unexpected-dependable";
 import { observable } from "@dependable/state";
 
-import { restoreObservablesFromCache } from "../src/restoreObservablesFromCache.js";
+import { observablesFromSnapshot } from "../src/observablesFromSnapshot.js";
 
 const expect = unexpected.clone().use(unexpectedDependable);
 
@@ -15,7 +15,7 @@ const objectObservable = observable(
 );
 const anonymousObservable = observable("Value of an anonymous observable");
 
-const cache = {
+const snapshot = {
   null: null,
   false: false,
   array: [0, 1, 2],
@@ -37,15 +37,15 @@ const cache = {
   },
 };
 
-describe("restoreObservablesFromCache", () => {
+describe("observablesFromSnapshot", () => {
   let observables;
+
   beforeEach(() => {
     // Make sure other tests doesn't have registered references
-    global.__dependable.nextId = 0;
     global.__dependable._references.clear();
     global.__dependable._initial.clear();
 
-    observables = restoreObservablesFromCache(cache);
+    observables = observablesFromSnapshot(snapshot);
   });
 
   it("returns observables corresponding to the cache", () => {

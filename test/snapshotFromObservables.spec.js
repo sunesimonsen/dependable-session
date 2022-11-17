@@ -2,11 +2,11 @@ import unexpected from "unexpected";
 import unexpectedDependable from "unexpected-dependable";
 import { observable } from "@dependable/state";
 
-import { storeObservableInCache } from "../src/storeObservableInCache.js";
+import { snapshotFromObservables } from "../src/snapshotFromObservables.js";
 
 const expect = unexpected.clone().use(unexpectedDependable);
 
-describe("storeObservableInCache", () => {
+describe("snapshotFromObservables", () => {
   let nullObservable,
     falseObservable,
     arrayObservable,
@@ -15,7 +15,6 @@ describe("storeObservableInCache", () => {
 
   beforeEach(() => {
     // Make sure other tests doesn't have registered references
-    global.__dependable.nextId = 0;
     global.__dependable._references.clear();
     global.__dependable._initial.clear();
 
@@ -31,28 +30,26 @@ describe("storeObservableInCache", () => {
   });
 
   it("throws when storing values that can't be serialized", () => {
-    const cache = {};
-
     const functionObservable = observable(() => {}, { id: "function" });
 
     expect(
       () => {
-        storeObservableInCache(functionObservable, cache);
+        snapshotFromObservables([functionObservable]);
       },
       "to throw",
-      "Observables can only contain JSON serializable data and other observables.\n" +
-        "Use the restore: false option to skip the observable"
+      "Observables can only contain JSON serializable data and other observables"
     );
   });
 
   it("stores observables with plain values", () => {
-    const cache = {};
-    storeObservableInCache(nullObservable, cache);
-    storeObservableInCache(falseObservable, cache);
-    storeObservableInCache(arrayObservable, cache);
-    storeObservableInCache(objectObservable, cache);
+    const snapshot = snapshotFromObservables([
+      nullObservable,
+      falseObservable,
+      arrayObservable,
+      objectObservable,
+    ]);
 
-    expect(cache, "to equal", {
+    expect(snapshot, "to equal", {
       null: null,
       false: false,
       array: [0, 1, 2],
@@ -78,11 +75,9 @@ describe("storeObservableInCache", () => {
       { id: "main" }
     );
 
-    const cache = {};
+    const snapshot = snapshotFromObservables([mainObservable]);
 
-    storeObservableInCache(mainObservable, cache);
-
-    expect(cache, "to equal", {
+    expect(snapshot, "to equal", {
       null: null,
       false: false,
       array: [0, 1, 2],
