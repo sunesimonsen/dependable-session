@@ -43,8 +43,8 @@ const storeObservableInCache = (observable, cache) => {
   return id;
 };
 
-export const snapshotFromObservables = (observables) => {
-  const cache = { nextId: 0, ids: new Map(), observables: {} };
+export const snapshotFromObservables = (observables, nextId = 0) => {
+  const cache = { nextId, ids: new Map(), observables: {} };
 
   Array.from(observables)
     .filter((subscribable) => subscribable.kind === "observable")
@@ -57,5 +57,5 @@ export const snapshotFromObservables = (observables) => {
       storeObservableInCache(subscribable, cache);
     });
 
-  return cache.observables;
+  return { nextId: cache.nextId, observables: cache.observables };
 };

@@ -40,8 +40,8 @@ export const observablesFromSnapshot = (snapshot) => {
   const result = {};
   const observables = {};
 
-  for (const id of Object.keys(snapshot)) {
-    result[id] = processObservable(id, snapshot, observables);
+  for (const id of Object.keys(snapshot.observables)) {
+    result[id] = processObservable(id, snapshot.observables, observables);
   }
 
   return observables;

@@ -58,8 +58,11 @@ describe("saveSession", () => {
       sessionStorage.getItem("@dependable/session"),
       "to equal",
       JSON.stringify({
-        array: [0, 1, 2],
-        text: "Hello session",
+        nextId: 0,
+        observables: {
+          array: [0, 1, 2],
+          text: "Hello session",
+        },
       })
     );
   });
@@ -70,8 +73,11 @@ describe("restoreSession", () => {
     sessionStorage.setItem(
       "@dependable/session",
       JSON.stringify({
-        text: "Hello session",
-        array: [0, 1, 2],
+        nextId: 0,
+        observables: {
+          text: "Hello session",
+          array: [0, 1, 2],
+        },
       })
     );
 
@@ -108,8 +114,11 @@ describe("restoreSession", () => {
       sessionStorage.setItem(
         "@dependable/session",
         JSON.stringify({
-          text: "Hello session",
-          array: [0, 1, 2],
+          nextId: 0,
+          observables: {
+            text: "Hello session",
+            array: [0, 1, 2],
+          },
         })
       );
 
@@ -144,8 +153,11 @@ describe("createSnapshot", () => {
 
   it("stores the state in session store", () => {
     expect(createSnapshot(), "to equal", {
-      text: "Hello session",
-      array: [0, 1, 2],
+      nextId: 0,
+      observables: {
+        text: "Hello session",
+        array: [0, 1, 2],
+      },
     });
   });
 });
@@ -153,8 +165,11 @@ describe("createSnapshot", () => {
 describe("restoreSnapshot", () => {
   beforeEach(() => {
     restoreSnapshot({
-      text: "Hello session",
-      array: [0, 1, 2],
+      nextId: 0,
+      observables: {
+        text: "Hello session",
+        array: [0, 1, 2],
+      },
     });
   });
 
