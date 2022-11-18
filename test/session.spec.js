@@ -58,8 +58,8 @@ describe("saveSession", () => {
       sessionStorage.getItem("@dependable/session"),
       "to equal",
       JSON.stringify({
-        text: "Hello session",
         array: [0, 1, 2],
+        text: "Hello session",
       })
     );
   });

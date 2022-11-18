@@ -14,15 +14,6 @@ export const saveSession = () => {
 };
 
 /**
- * Returns a snapshot of the current session.
- *
- * @returns {import('./shared').SessionSnapshot} a snapshot of the current session.
- */
-export const createSnapshot = () => {
-  return snapshotFromObservables(subscribables());
-};
-
-/**
  * Restore saved @dependable/state from session storage.
  *
  * @throws Error if no session has been stored.
@@ -37,6 +28,15 @@ export const restoreSession = () => {
   const snapshot = JSON.parse(data);
 
   restoreSnapshot(snapshot);
+};
+
+/**
+ * Returns a snapshot of the current session.
+ *
+ * @returns {import('./shared').SessionSnapshot} a snapshot of the current session.
+ */
+export const createSnapshot = () => {
+  return snapshotFromObservables(subscribables());
 };
 
 /**
