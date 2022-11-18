@@ -26,12 +26,19 @@ const processValue = (value, snapshot, observables) => {
   }
 };
 
+const isAnonymous = (id) => id.match(/^\$\d+$/);
+
 const processObservable = (id, snapshot, observables) => {
   if (observables[id]) return observables[id];
 
   const value = processValue(snapshot[id], snapshot, observables);
 
-  observables[id] = observable(value, { id });
+  if (isAnonymous(id)) {
+    observables[id] = observable(value);
+    observables[id].sessionId = id;
+  } else {
+    observables[id] = observable(value, { id });
+  }
 
   return observables[id];
 };
@@ -40,8 +47,8 @@ export const observablesFromSnapshot = (snapshot) => {
   const result = {};
   const observables = {};
 
-  for (const id of Object.keys(snapshot)) {
-    result[id] = processObservable(id, snapshot, observables);
+  for (const id of Object.keys(snapshot.observables)) {
+    result[id] = processObservable(id, snapshot.observables, observables);
   }
 
   return observables;

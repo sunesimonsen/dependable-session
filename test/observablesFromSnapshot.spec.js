@@ -16,40 +16,43 @@ const objectObservable = observable(
 const anonymousObservable = observable("Value of an anonymous observable");
 
 const snapshot = {
-  null: null,
-  false: false,
-  array: [0, 1, 2],
-  object: { zero: 0, one: 1, two: 2 },
-  $0: "Value of an anonymous observable",
-  $1: { $reference: "$0" },
-  main: {
-    plainValue: 42,
-    nestedArray: [{ $reference: "null" }, { $reference: "false" }],
-    nestedObject: {
-      array: { $reference: "array" },
-      object: { $reference: "object" },
-      anonymous: { $reference: "$0" },
-    },
-    anonymous: {
-      anonymousObservable: { $reference: "$0" },
-      nested: { $reference: "$1" },
+  nextId: 42,
+  observables: {
+    null: null,
+    false: false,
+    array: [0, 1, 2],
+    object: { zero: 0, one: 1, two: 2 },
+    $0: "Value of an anonymous observable",
+    $1: { $reference: "$0" },
+    main: {
+      plainValue: 42,
+      nestedArray: [{ $reference: "null" }, { $reference: "false" }],
+      nestedObject: {
+        array: { $reference: "array" },
+        object: { $reference: "object" },
+        anonymous: { $reference: "$0" },
+      },
+      anonymous: {
+        anonymousObservable: { $reference: "$0" },
+        nested: { $reference: "$1" },
+      },
     },
   },
 };
 
 describe("observablesFromSnapshot", () => {
-  let observables;
+  let state;
 
   beforeEach(() => {
     // Make sure other tests doesn't have registered references
     global.__dependable._references.clear();
     global.__dependable._initial.clear();
 
-    observables = observablesFromSnapshot(snapshot);
+    state = observablesFromSnapshot(snapshot);
   });
 
-  it("returns observables corresponding to the cache", () => {
-    expect(observables, "to satisfy", {
+  it("returns state corresponding to the cache", () => {
+    expect(state, "to satisfy", {
       null: nullObservable,
       false: falseObservable,
       array: arrayObservable,

@@ -50,10 +50,13 @@ describe("snapshotFromObservables", () => {
     ]);
 
     expect(snapshot, "to equal", {
-      null: null,
-      false: false,
-      array: [0, 1, 2],
-      object: { zero: 0, one: 1, two: 2 },
+      nextId: 0,
+      observables: {
+        null: null,
+        false: false,
+        array: [0, 1, 2],
+        object: { zero: 0, one: 1, two: 2 },
+      },
     });
   });
 
@@ -78,23 +81,26 @@ describe("snapshotFromObservables", () => {
     const snapshot = snapshotFromObservables([mainObservable]);
 
     expect(snapshot, "to equal", {
-      null: null,
-      false: false,
-      array: [0, 1, 2],
-      object: { zero: 0, one: 1, two: 2 },
-      $0: "Value of an anonymous observable",
-      $1: { $reference: "$0" },
-      main: {
-        plainValue: 42,
-        nestedArray: [{ $reference: "null" }, { $reference: "false" }],
-        nestedObject: {
-          array: { $reference: "array" },
-          object: { $reference: "object" },
-          anonymous: { $reference: "$0" },
-        },
-        anonymous: {
-          anonymousObservable: { $reference: "$0" },
-          nested: { $reference: "$1" },
+      nextId: 2,
+      observables: {
+        null: null,
+        false: false,
+        array: [0, 1, 2],
+        object: { zero: 0, one: 1, two: 2 },
+        $0: "Value of an anonymous observable",
+        $1: { $reference: "$0" },
+        main: {
+          plainValue: 42,
+          nestedArray: [{ $reference: "null" }, { $reference: "false" }],
+          nestedObject: {
+            array: { $reference: "array" },
+            object: { $reference: "object" },
+            anonymous: { $reference: "$0" },
+          },
+          anonymous: {
+            anonymousObservable: { $reference: "$0" },
+            nested: { $reference: "$1" },
+          },
         },
       },
     });

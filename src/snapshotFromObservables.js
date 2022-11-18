@@ -29,7 +29,7 @@ const toJSON = (value, cache) => {
 };
 
 const storeObservableInCache = (observable, cache) => {
-  let id = observable.id || cache.ids.get(observable);
+  let id = observable.id || observable.sessionId || cache.ids.get(observable);
 
   if (!id) {
     id = "$" + cache.nextId++;
@@ -43,19 +43,19 @@ const storeObservableInCache = (observable, cache) => {
   return id;
 };
 
-export const snapshotFromObservables = (observables) => {
-  const cache = { nextId: 0, ids: new Map(), observables: {} };
+export const snapshotFromObservables = (observables, nextId = 0) => {
+  const cache = { nextId, ids: new Map(), observables: {} };
 
   Array.from(observables)
     .filter((subscribable) => subscribable.kind === "observable")
     .sort((a, b) => {
-      if (a.id > b.id) return -1;
-      if (a.id < b.id) return 1;
+      if (a.id < b.id) return -1;
+      if (a.id > b.id) return 1;
       return 0;
     })
     .forEach((subscribable) => {
       storeObservableInCache(subscribable, cache);
     });
 
-  return cache.observables;
+  return { nextId: cache.nextId, observables: cache.observables };
 };

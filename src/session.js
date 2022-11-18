@@ -4,22 +4,15 @@ import { snapshotFromObservables } from "./snapshotFromObservables.js";
 import { observablesFromSnapshot } from "./observablesFromSnapshot.js";
 import { createPatch, applyPatch } from "./objectDiff.js";
 
+let nextId = 0;
+
 /**
  * Save the current @dependable/state to session storage.
  */
 export const saveSession = () => {
-  const snapshot = createSnapshot();
+  const snapshot = createSnapshot(nextId);
 
   sessionStorage.setItem("@dependable/session", JSON.stringify(snapshot));
-};
-
-/**
- * Returns a snapshot of the current session.
- *
- * @returns {import('./shared').SessionSnapshot} a snapshot of the current session.
- */
-export const createSnapshot = () => {
-  return snapshotFromObservables(subscribables());
 };
 
 /**
@@ -40,12 +33,24 @@ export const restoreSession = () => {
 };
 
 /**
+ * Returns a snapshot of the current session.
+ *
+ * @params {number} nextId the id number base to use when generating ids.
+ * @returns {import('./shared').SessionSnapshot} a snapshot of the current session.
+ */
+export const createSnapshot = (nextId = 0) => {
+  return snapshotFromObservables(subscribables(), nextId);
+};
+
+/**
  * Restore the observables for the given snapshot.
  *
  * @param {import('./shared').SessionSnapshot} snapshot the snapshot to be restored.
  */
 export const restoreSnapshot = (snapshot) => {
   const observables = observablesFromSnapshot(snapshot);
+
+  nextId = snapshot.nextId;
 
   for (const observable of Object.values(observables)) {
     registerInitial(observable);
