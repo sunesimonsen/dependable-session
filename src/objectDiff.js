@@ -1,3 +1,5 @@
+import { isEqual } from "./isEqual.js";
+
 const createArrayUpdates = (current, next, delMarker) => {
   if (!Array.isArray(current)) return next;
 
@@ -24,18 +26,6 @@ const createArrayUpdates = (current, next, delMarker) => {
   return updates;
 };
 
-const hasArrayChanges = (updates, current) =>
-  !Array.isArray(current) ||
-  updates.length !== current.length ||
-  updates.some((update, i) => {
-    if (update !== null) {
-      if (Array.isArray(update)) return hasArrayChanges(update, current[i]);
-      if (typeof update === "object") return Object.keys(update).length;
-    }
-
-    return !Object.is(update, current[i]);
-  });
-
 const createUpdates = (current, next, delMarker) => {
   if (Array.isArray(next)) {
     return createArrayUpdates(current, next, delMarker);
@@ -47,21 +37,14 @@ const createUpdates = (current, next, delMarker) => {
   const updates = {};
 
   for (const key of nKeys) {
-    if (
-      !next[key] ||
-      typeof next[key] !== "object" ||
-      typeof current[key] !== "object"
-    ) {
-      if (!Object.is(next[key], current[key])) {
+    if (!isEqual(current[key], next[key])) {
+      if (
+        !next[key] ||
+        typeof next[key] !== "object" ||
+        typeof current[key] !== "object"
+      ) {
         updates[key] = next[key];
-      }
-    } else {
-      const keyUpdates = createUpdates(current[key], next[key], delMarker);
-      const hasChanges = Array.isArray(keyUpdates)
-        ? hasArrayChanges(keyUpdates, current[key])
-        : Object.keys(keyUpdates).length;
-
-      if (hasChanges) {
+      } else {
         updates[key] = createUpdates(current[key], next[key], delMarker);
       }
     }
