@@ -29,7 +29,7 @@ const toJSON = (value, cache) => {
 };
 
 const storeObservableInCache = (observable, cache) => {
-  let id = observable.id || cache.ids.get(observable);
+  let id = observable.id || observable.sessionId || cache.ids.get(observable);
 
   if (!id) {
     id = "$" + cache.nextId++;
