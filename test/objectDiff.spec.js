@@ -63,6 +63,24 @@ const examples = [
       d: "$del",
     },
   },
+  {
+    current: { a: ["a", { a: { "a.a": "a.a", "a.c": "a.c" }, b: "b" }, "c"] },
+    next: { a: ["a", { a: { "a.a": "a.a", "a.c": "a.c" }, b: "b" }] },
+    patch: {
+      u: {
+        a: ["a", {}],
+      },
+      d: "$del",
+    },
+  },
+  {
+    current: { a: ["a", "b", "c"] },
+    next: { a: ["a", "b", "c"] },
+    patch: {
+      u: {},
+      d: "$del",
+    },
+  },
 ];
 
 describe("createPatch", () => {

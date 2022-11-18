@@ -13,10 +13,7 @@ const createArrayUpdates = (current, next, delMarker) => {
     ) {
       updates[i] = next[i];
     } else {
-      const keyUpdates = createUpdates(current[i], next[i], delMarker);
-      if (Object.keys(keyUpdates).length) {
-        updates[i] = createUpdates(current[i], next[i], delMarker);
-      }
+      updates[i] = createUpdates(current[i], next[i], delMarker);
     }
   }
 
@@ -26,6 +23,18 @@ const createArrayUpdates = (current, next, delMarker) => {
 
   return updates;
 };
+
+const hasArrayChanges = (updates, current) =>
+  !Array.isArray(current) ||
+  updates.length !== current.length ||
+  updates.some((update, i) => {
+    if (update !== null) {
+      if (Array.isArray(update)) return hasArrayChanges(update, current[i]);
+      if (typeof update === "object") return Object.keys(update).length;
+    }
+
+    return !Object.is(update, current[i]);
+  });
 
 const createUpdates = (current, next, delMarker) => {
   if (Array.isArray(next)) {
@@ -48,7 +57,11 @@ const createUpdates = (current, next, delMarker) => {
       }
     } else {
       const keyUpdates = createUpdates(current[key], next[key], delMarker);
-      if (Object.keys(keyUpdates).length) {
+      const hasChanges = Array.isArray(keyUpdates)
+        ? hasArrayChanges(keyUpdates, current[key])
+        : Object.keys(keyUpdates).length;
+
+      if (hasChanges) {
         updates[key] = createUpdates(current[key], next[key], delMarker);
       }
     }
