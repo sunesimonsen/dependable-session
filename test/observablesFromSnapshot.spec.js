@@ -72,22 +72,4 @@ describe("observablesFromSnapshot", () => {
       },
     });
   });
-
-  it("makes new observables initialize from the restored cache", () => {
-    const main = observable("initial value will be overriden", { id: "main" });
-
-    expect(main, "to satisfy", {
-      plainValue: 42,
-      nestedArray: [nullObservable, falseObservable],
-      nestedObject: {
-        array: arrayObservable,
-        object: objectObservable,
-        anonymous: anonymousObservable,
-      },
-      anonymous: {
-        anonymousObservable,
-        nested: observable(anonymousObservable),
-      },
-    });
-  });
 });

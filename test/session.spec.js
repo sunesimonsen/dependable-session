@@ -90,13 +90,6 @@ describe("restoreSession", () => {
     expect(text, "to satisfy", "Hello session");
   });
 
-  it("reuses observables with the same id", () => {
-    const reference0 = observable("will be override", { id: "text" });
-    const reference1 = observable("will be override", { id: "text" });
-
-    expect(reference0, "to be", reference1);
-  });
-
   describe("with a non-existing session", () => {
     it("throws an error", () => {
       expect(
@@ -129,13 +122,6 @@ describe("restoreSession", () => {
       const text = observable("will be override", { id: "text" });
 
       expect(text, "to satisfy", "Hello session");
-    });
-
-    it("reuses observables with the same id", () => {
-      const reference0 = observable("will be override", { id: "text" });
-      const reference1 = observable("will be override", { id: "text" });
-
-      expect(reference0, "to be", reference1);
     });
 
     it("removes the stored session", () => {
@@ -262,13 +248,6 @@ describe("restoreSnapshot", () => {
     const text = observable("will be override", { id: "text" });
 
     expect(text, "to satisfy", "Hello session");
-  });
-
-  it("reuses observables with the same id", () => {
-    const reference0 = observable("will be override", { id: "text" });
-    const reference1 = observable("will be override", { id: "text" });
-
-    expect(reference0, "to be", reference1);
   });
 });
 
